@@ -1,3 +1,5 @@
+
+
 import {
     IonContent,
     IonHeader,
@@ -7,7 +9,8 @@ import {
   } from "@ionic/react";
   import "./Tambola.css";
   import Menu from "../../components/Menu";
-  
+  const io = require('socket.io-client')
+  const socket = io("ws://localhost:4000");  
   const tambola: React.FC = () => {
     return (
       <IonPage>

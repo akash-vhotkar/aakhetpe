@@ -18,7 +18,7 @@ import Volume from './pages/Volume';
 import Slider from "./pages/Slider";
 import Chess from "./pages/Chess/Chess";
 import Bingo from "./pages/Bingo/Bingo";
-import Tambola from "./pages/Tambola/Tambola";
+import Tambola from "./pages/Tambola/TambolaHome";
 import TickTock from "./pages/Tick-Tock/TickTock";
 import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
 
