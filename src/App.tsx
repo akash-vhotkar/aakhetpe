@@ -21,7 +21,7 @@ import Bingo from "./pages/Bingo/Bingo";
 import Tambola from "./pages/Tambola/TambolaHome";
 import TickTock from "./pages/Tick-Tock/TickTock";
 import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
-
+import Tambolaroom from "./pages/Tambola/Tambolaroom";
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
 
@@ -40,6 +40,7 @@ import '@ionic/react/css/display.css';
 
 /* Theme variables */
 import './theme/variables.css';
+import Tambolacreateroom from './pages/Tambola/TambolaCreateRoom';
 
 const App: React.FC = () => (
   <IonApp>
@@ -54,6 +55,8 @@ const App: React.FC = () => (
           <Route exact path="/slider"><Slider /></Route>
           <Route exact path="/bingo"><Bingo /></Route>
           <Route exact path="/tambola"><Tambola /></Route>
+         
+          <Route exact path="/tambola/:roomid"><Tambolaroom></Tambolaroom></Route>
           <Route exact path="/ticktock"><TickTock /></Route>
           <Route exact path="/chess"><Chess /></Route>
           <Route exact path="/"><Redirect to="/home" /></Route>

@@ -1,36 +1,48 @@
 const http = require('http');
 const express = require('express');
 const socketio = require('socket.io');
-const cors = require('cors');
 const mongoose = require('mongoose');
-
+const cors = require('cors');
 const app = express();
-const server = http.createServer(app);
 
+
+
+mongoose.connect("mongodb+srv://akash:akash1234@cluster0.4ayge.mongodb.net/bookmytaxi?retryWrites=true&w=majority", { useNewUrlParser: true, useUnifiedTopology: true }).then(() => {
+    console.log("database connected successfully");
+}).catch(err => {
+    if (err) console.log(err);
+})
+
+const server = http.createServer(app);
+const tambolacontroller = require('./controller/tambolaroomcontroller')
 const io = socketio(server,{
     cors:{
         origin: "http://localhost:3000"
     }
 });
 io.on('connection', (socket) => {
-    
-    socket.on('disconnect', () =>{
+    socket.on('tamboladisconnect', () =>{
         console.log("disconned is fired ")
     });   
-    socket.on('message',(message)=>{
-        console.log("server received the messages ", message);
+    socket.on('tambolamessage',(message)=>{
+        
     })
-    socket.on('joinroom',()=>{
-        console.log("join room is fired");
+    socket.on('getusers', async (roomid)=>{
+        const allusers = await tambolacontroller().getusers(roomid);
+        console.log("allusers is ", allusers);
+        socket.emit('getusers',  allusers)
+    })
+    socket.on('tambolajoinroom',()=>{
+        console.log("join room is fired");  
+    })
+    socket.on('tambolacreateroom', async (name,roomtype, roomamount)=>{
+     const roomadmin=  await tambolacontroller().createroom(socket.id, name, roomtype, roomamount );
+     io.emit("tambolacreateroom", roomadmin);
     
     })
-    socket.on('createroom',()=>{
-        console.log("createroom is fired");
-
-    })
     
     
-    socket.on('playonline', () => {
+    socket.on('tambolaplayonline', () => {
         console.log("play online is fired ");
 
     });
@@ -38,4 +50,4 @@ io.on('connection', (socket) => {
 
  });
 
-server.listen(process.env.PORT || 4000, () => console.log(`Server has started.`));
+server.listen(process.env.PORT || 5000, () => console.log(`Server has started.`));
