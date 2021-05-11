@@ -1,14 +1,21 @@
 const http =  require('http');
-const tambolaroommodel = require('../model/Tambolaroom')
+const tambolaroommodel = require('../model/Tambolaroom');
+const tambolauser = require('../model/Tambolauser');
 const io = require('socket.io');
 const generator = require('generate-password');
+const tambola = require('tambola-generator');
+const Tambolaroom = require('../model/Tambolaroom');
 const tambolafun =()=>{
     return {
         // getusers of the room
         async getusers(roomid){
             try{
-            const roomusers = await tambolaroommodel.find({roomid: roomid});
-            return {err: 0 , data : roomusers}
+            const roomusers = await tambolauser.find({roomid: roomid});
+            const users = [];
+            roomusers.forEach(user=>{
+                users.push(user.name);
+            })
+            return {err: 0 , data : users}
             
             }
             catch(err){
@@ -19,56 +26,68 @@ const tambolafun =()=>{
         // name amount  roomtype
         async  createroom(socketid , name, roomtype,  roomamount){
             const roomid = generator.generate({length:8, numbers: true});
-            console.log(roomid); 
-            console.log("   name ", name, " thise s roomtype" , roomtype,"  thise is roomamount ", roomamount);
-            const roomadmin = {
-                name: name,
-                socketid: socketid,
-                roomtype: parseInt(roomtype),
+            const ticket = tambola.getTickets(1);
+            const draw =  tambola.getDrawSequence();
+       
+            const roomadmin =      {
+                name:name,
+                socketid:socketid ,
                 usertype:"Admin",
-                roomamount : roomamount,
-                roomid: roomid
-            }
+                ticket:ticket ,
+                balanceticket : ticket,
+                roomid: roomid ,
+                useramount : roomamount
+        }
+        const newroom = {
+           roomid : roomid,
+           roomtype: roomtype,
+           roomamount: roomamount,
+           roombalancedraw: draw,
+           roomadmin: name
+       }
+       try{
+           const user = await tambolauser.create(roomadmin);
+           const room = await tambolaroommodel.create(newroom);
+           return  {err: 0 , message : "Room created successfully" , data: user};
+           
+
+       }catch(err){
+           if(err) console.log(err);
+           return {err: 1, message :"Internal server error "};
+       }
             
-            try{
-                const roomdata = await tambolaroommodel.create(roomadmin);
-                return {err:0, message:"Room created successfully", data: roomdata};
-            }
-            catch(err){
-                if(err) console.log(err);
-            }       
-                    
+            
                       
         },// name roomid
-        async joinroom(socketid, name, roomid , ticket){
+        async joinroom(socketid,  roomid, name){
             try{
-                const roomadmin = await tambolaroommodel.findOne({roomid: roomid, usertype: "Admin"});
-                const roomtype = roomadmin.roomtype;
-                const noofusersinroom =  await tambolaroommodel.find({roomid: roomid});
-                const adminamount =  roomadmin.roomamount;
-                const adminroomtype  = roomadmin.roomtype;
-                if(noofusersinroom>= roomtype){
-                    return {err:1 , message:"Room is full"};
-                }
-                else {
-
-                    const  newroommembar = {
-                        roomid: roomid,
-                        name : name,
-                        ticket: ticket,
-                        usertype: "player",
-                        roomamount : adminamount,
+                const roomdata = await tambolaroommodel.find({roomid: roomid});
+                const roomtype = roomdata.roomtype;
+                const roomamount = roomdata.roomamount;
+                const  usersinroom = await tambolauser.find({roomid: roomid}).count();
+                if(usersinroom>  roomtype){
+                    const  ticket = tambola.getTickets(1);
+                    const newuser = {
+                        name : name ,
                         socketid: socketid,
-                        roomtype: adminroomtype
-                        
-                    }
-                    const newplayer = await tambolaroommodel.create(newroommembar);
-                    if(newplayer)  return  {err:0 , message:"player added in room ", data :  newplayer};
-                    else return {err: 1 ,message: "Server error "};
-                }     
+                        roomid: roomid,
+                        ticket: ticket,
+                        usertype: "Player",
+                        balanceticket:  ticket,
+                        useramount : roomamount
+                    }   
+                    const newuser =  await  tambolauser.create(newuser);
+                    return {err: 1, message:" Room is full ", data: newuser}
+                } 
+                else{
+
+                    
+                return {err: 0, message: "Room jpined successfully"}
+                }
+
             }catch(err){
                 if(err) console.log(err);
-                return {err: 0 , message :"Internal server error"}
+                return {err: 1, message: "Internal server error"}
             }
         }
     }

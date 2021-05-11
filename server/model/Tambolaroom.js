@@ -1,26 +1,5 @@
 const mongoose = require('mongoose');
 module.exports = mongoose.model("Tambolaroom",{
-    socketid:{
-        type:String,
-        required: true
-
-    },
-    name: {
-        type:String,
-        required: true
-    },
-    usertype:{
-        type:String,
-        required: true
-    },
-    ticket:{
-        type:Array,
-        required: false
-    },
-    ticketbalanceno:{
-        type:Array,
-        required: false
-    },
     roomid:{
         type:String,
         required: false,
@@ -32,6 +11,14 @@ module.exports = mongoose.model("Tambolaroom",{
     },
     roomamount : {
         type:Number,
+        required: true
+    },
+    roombalancedraw : {
+        type:Array,
+        required: true
+    },
+    roomadmin: {
+        type:String,
         required: true
     }
     

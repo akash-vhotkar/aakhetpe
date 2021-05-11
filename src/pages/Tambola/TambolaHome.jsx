@@ -16,7 +16,7 @@ const TambolaHome = () => {
     const [message, setmessage] = useState("");
     const [roomtype, setroomtype] = useState('');
     const [roomamount , setroomamount] = useState('');
-    const name= "akash";
+    const [name ,setname]= useState('');
     console.log(roomid);
     socket.on('connect', () => {
         console.log("connected to server");
@@ -40,7 +40,7 @@ const TambolaHome = () => {
     }
     function joinroom(e) {
         e.preventDefault() 
-        socket.emit("tambolajoinroom",{roomtype,name});
+        socket.emit("tambolajoinroom",{roomid,name});
     }
     function playonline() {
         socket.emit("tambolaplayonline")
@@ -52,6 +52,8 @@ const TambolaHome = () => {
                 
                 <div class="container">
                     <h1 class="text-center">Online Tambola game </h1>
+                    <h1>the username of the page</h1>
+                    <input type="text" value={name}  onChange={(e)=> setname(e.target.value)}/>
                     <div class="row">
                         <div className="col-md-3">
                             <form onSubmit={joinroom}>
